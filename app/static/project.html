@@ -4,17 +4,17 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Project — Ремонт квартири</title>
+   <title>Проєкт — Ремонт квартири</title>
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-   <link rel="stylesheet" href="/static/style.css?v=10">
+   <link rel="stylesheet" href="/static/style.css?v=12">
 </head>
 
 <body>
    <main class="projects-page">
       <div class="projects-page__container">
-         <a class="back-link" href="/">← До всіх Projects</a>
+         <a class="back-link" href="/">← До всіх проєктів</a>
          <p class="projects-page__status" id="project-status">Завантаження…</p>
          <section class="project-details" id="project-details" hidden>
             <h1 class="projects-page__title" id="project-title"></h1>
@@ -27,12 +27,12 @@
                <span class="project-card__progress" id="project-progress"></span>
             </div>
             <div class="project-details__task-header">
-               <h2 class="project-details__heading">Tasks</h2>
-               <button class="projects-page__add" id="edit-project" type="button">Редагувати Project і Tasks</button>
+               <h2 class="project-details__heading">Задачі</h2>
+               <button class="projects-page__add" id="edit-project" type="button">Редагувати проєкт і задачі</button>
             </div>
             <p class="task-action-status" id="task-action-status" role="status" hidden></p>
             <ul class="task-list" id="task-list"></ul>
-            <p class="projects-page__status" id="tasks-empty" hidden>У цьому Project ще немає Tasks.</p>
+            <p class="projects-page__status" id="tasks-empty" hidden>У цьому проєкті ще немає задач.</p>
          </section>
          <section class="project-editor" id="project-edit-view" hidden>
             <form class="project-form" id="project-edit-form">
@@ -47,7 +47,7 @@
                </label>
                <div class="project-edit__tasks-header">
                   <h3 class="project-edit__tasks-title">Задачі проєкту</h3>
-                  <button class="project-form__cancel" id="add-edit-task" type="button">+ Додати Task</button>
+                  <button class="project-form__cancel" id="add-edit-task" type="button">+ Додати задачу</button>
                </div>
                <p class="project-edit__empty" id="project-edit-empty" hidden>У проєкті ще немає задач.</p>
                <div class="project-edit__task-list" id="project-edit-task-list"></div>
@@ -61,7 +61,7 @@
          <dialog class="project-dialog task-completion-dialog" id="task-completion-dialog"
             aria-labelledby="task-completion-title">
             <div class="project-form">
-               <h2 class="project-dialog__title" id="task-completion-title">Статус Task</h2>
+               <h2 class="project-dialog__title" id="task-completion-title">Статус задачі</h2>
                <p class="task-completion-dialog__question" id="task-completion-question"></p>
                <div class="project-form__actions">
                   <button class="project-form__cancel" id="cancel-task-completion" type="button">Скасувати</button>
@@ -72,7 +72,7 @@
          </dialog>
       </div>
    </main>
-   <script src="/static/project.js?v=10"></script>
+   <script src="/static/project.js?v=13"></script>
 </body>
 
 </html>

@@ -8,7 +8,7 @@
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-   <link rel="stylesheet" href="/static/style.css?v=6">
+   <link rel="stylesheet" href="/static/style.css?v=9">
 </head>
 
 <body>
@@ -22,14 +22,14 @@
                </p>
             </div>
             <button class="projects-page__add" id="add-project" type="button">
-               + Додати Project
+               + Додати проєкт
             </button>
          </div>
          <p class="projects-page__status" id="projects-status">Завантаження…</p>
          <div class="projects-grid" id="projects-grid"></div>
          <dialog class="project-dialog" id="project-dialog" aria-labelledby="project-dialog-title">
             <form class="project-form" id="project-form">
-               <h2 class="project-dialog__title" id="project-dialog-title">Новий Project</h2>
+               <h2 class="project-dialog__title" id="project-dialog-title">Новий проєкт</h2>
                <label class="project-form__field">
                   Назва
                   <input name="name" type="text" maxlength="200" required>
@@ -52,13 +52,13 @@
                <p class="project-form__error" id="project-form-error" role="alert" hidden></p>
                <div class="project-form__actions">
                   <button class="project-form__cancel" id="cancel-project" type="button">Скасувати</button>
-                  <button class="projects-page__add" id="save-project" type="submit">Створити Project</button>
+                  <button class="projects-page__add" id="save-project" type="submit">Створити проєкт</button>
                </div>
             </form>
          </dialog>
       </div>
    </main>
-   <script src="/static/app.js?v=7"></script>
+   <script src="/static/app.js?v=11"></script>
 </body>
 
 </html>

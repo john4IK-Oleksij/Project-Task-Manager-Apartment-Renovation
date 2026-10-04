@@ -412,6 +412,16 @@ body {
     line-height: 1.5;
 }
 
+.project-card__task-name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.project-card__task .badge {
+    flex-shrink: 0;
+}
+
 .project-card__checkbox {
     display: flex;
     justify-content: center;
@@ -827,18 +837,18 @@ body {
 }
 
 .badge--low {
-    background-color: #dbe6dd;
-    color: var(--primary-hover);
+    background-color: #dceeff;
+    color: #1557a0;
 }
 
 .badge--medium {
-    background-color: #dde3ec;
-    color: var(--text-soft);
+    background-color: #fff0cc;
+    color: #8a4b08;
 }
 
 .badge--high {
-    background-color: #f3d9dc;
-    color: var(--danger-hover);
+    background-color: #fbe0e2;
+    color: #a51f2b;
 }
 
 @media (max-width: 500px) {

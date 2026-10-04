@@ -23,6 +23,8 @@ let projectId = null;
 let currentProject = null;
 let completionTask = null;
 let removedTaskIds = new Set();
+let initialEditorState = null;
+let allowNavigation = false;
 
 function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -32,7 +34,7 @@ function el(tag, className, text) {
 }
 
 async function responseError(response, fallback) {
-    if (response.status === 404) return "Project або Task не знайдено. Оновіть сторінку та спробуйте ще раз.";
+    if (response.status === 404) return "Проєкт або задачу не знайдено. Оновіть сторінку та спробуйте ще раз.";
     try {
         const body = await response.json();
         if (typeof body.detail === "string") return body.detail;
@@ -73,6 +75,32 @@ function updateEditTaskNumbers() {
         row.querySelector(".project-edit__task-number").textContent = `${index + 1}.`;
     });
     editTasksEmpty.hidden = editTaskList.children.length > 0;
+}
+
+function getEditorState() {
+    const tasks = [...editTaskList.querySelectorAll(".project-edit__task")].map((row) => ({
+        id: row.dataset.taskId || null,
+        title: row.querySelector(".project-edit__task-fields input[type=\"text\"]").value.trim(),
+        description: row.querySelector("textarea").value.trim(),
+        priority: row.querySelector("select").value,
+        dueDate: row.querySelector("input[type=\"date\"]").value,
+    }));
+    return {
+        name: editForm.elements.project_name.value.trim(),
+        description: editForm.elements.project_description.value.trim(),
+        tasks,
+        removedTaskIds: [...removedTaskIds].sort((a, b) => a - b),
+    };
+}
+
+function hasUnsavedChanges() {
+    return initialEditorState !== null
+        && JSON.stringify(getEditorState()) !== JSON.stringify(initialEditorState);
+}
+
+function confirmEditorExit() {
+    if (!hasUnsavedChanges()) return true;
+    return window.confirm("Є незбережені зміни. Вийти без збереження?");
 }
 
 function addEditTaskRow(task = null) {
@@ -140,25 +168,27 @@ function openEditForm() {
     if (!currentProject) return;
     removedTaskIds = new Set();
     editError.hidden = true;
-    editTitle.textContent = `Редагування — ${currentProject.name}`;
+    editTitle.textContent = `Редагування проєкту — ${currentProject.name}`;
     editForm.elements.project_name.value = currentProject.name;
     editForm.elements.project_description.value = currentProject.description || "";
     editTaskList.replaceChildren();
     currentProject.tasks.forEach((task) => addEditTaskRow(task));
     updateEditTaskNumbers();
+    initialEditorState = getEditorState();
+    allowNavigation = false;
     details.hidden = true;
     editView.hidden = false;
     const backLink = document.querySelector(".back-link");
     backLink.href = `/static/project.html?id=${projectId}`;
-    backLink.textContent = "← До Project";
+    backLink.textContent = "← До проєкту";
     document.getElementById("cancel-project-edit").href = `/static/project.html?id=${projectId}`;
-    document.title = `Редагування — ${currentProject.name}`;
+    document.title = `Редагування проєкту — ${currentProject.name}`;
     editForm.elements.project_name.focus();
 }
 
 function askTaskCompletion(task) {
     completionTask = task;
-    completionQuestion.textContent = `Чи задача «${task.title}» є виконаною?`;
+    completionQuestion.textContent = `Чи задачу «${task.title}» виконано?`;
     completionDialog.showModal();
 }
 
@@ -201,17 +231,17 @@ function showError(message) {
 async function loadProject() {
     projectId = Number(new URLSearchParams(location.search).get("id"));
     if (!Number.isInteger(projectId) || projectId < 1) {
-        showError("Некоректне посилання на Project.");
+        showError("Некоректне посилання на проєкт.");
         return;
     }
     try {
         const response = await fetch(`/projects/${projectId}`);
         if (response.status === 404) {
-            showError("Project не знайдено.");
+            showError("Проєкт не знайдено.");
             return;
         }
         if (!response.ok) {
-            throw new Error(await responseError(response, "Не вдалося завантажити Project."));
+            throw new Error(await responseError(response, "Не вдалося завантажити проєкт."));
         }
         renderProject(await response.json());
         const params = new URLSearchParams(location.search);
@@ -219,7 +249,7 @@ async function loadProject() {
             openEditForm();
         }
     } catch (error) {
-        showError(error.message || "Не вдалося завантажити Project. Спробуйте пізніше.");
+        showError(error.message || "Не вдалося завантажити проєкт. Спробуйте пізніше.");
     }
 }
 
@@ -254,6 +284,12 @@ async function saveProjectAndTasks(event) {
         editForm.elements.project_name.setCustomValidity("");
         return;
     }
+    if (/^\p{Decimal_Number}+$/u.test(projectName)) {
+        editError.textContent = "Назва проєкту не може складатися лише з цифр.";
+        editError.hidden = false;
+        editForm.elements.project_name.focus();
+        return;
+    }
 
     const rows = [...editTaskList.querySelectorAll(".project-edit__task")];
     const tasks = rows.map((row) => ({
@@ -276,6 +312,13 @@ async function saveProjectAndTasks(event) {
         editError.hidden = false;
         return;
     }
+    if (tasks.some((task) => /^\p{Decimal_Number}+$/u.test(task.title))) {
+        editError.textContent = "Назва задачі не може складатися лише з цифр.";
+        editError.hidden = false;
+        tasks.find((task) => /^\p{Decimal_Number}+$/u.test(task.title))?.row
+            .querySelector(".project-edit__task-fields input[type=\"text\"]").focus();
+        return;
+    }
 
     const idsToDelete = [...removedTaskIds];
 
@@ -290,7 +333,7 @@ async function saveProjectAndTasks(event) {
             }),
         });
         if (!projectResponse.ok) {
-            throw new Error(await responseError(projectResponse, "Не вдалося оновити Project."));
+            throw new Error(await responseError(projectResponse, "Не вдалося оновити проєкт."));
         }
 
         for (const task of tasks) {
@@ -325,6 +368,7 @@ async function saveProjectAndTasks(event) {
             removedTaskIds.delete(taskId);
         }
 
+        allowNavigation = true;
         location.href = `/static/project.html?id=${projectId}`;
     } catch (error) {
         const message = error.message || "Не вдалося зберегти зміни.";
@@ -346,9 +390,24 @@ document.getElementById("cancel-task-completion").addEventListener("click", () =
     completionDialog.close();
     completionTask = null;
 });
+for (const link of [document.querySelector(".back-link"), document.getElementById("cancel-project-edit")]) {
+    link.addEventListener("click", (event) => {
+        if (!confirmEditorExit()) {
+            event.preventDefault();
+            return;
+        }
+        if (hasUnsavedChanges()) allowNavigation = true;
+    });
+}
+window.addEventListener("beforeunload", (event) => {
+    if (!allowNavigation && hasUnsavedChanges()) {
+        event.preventDefault();
+        event.returnValue = "";
+    }
+});
 editForm.elements.project_name.addEventListener("input", () => {
     const name = editForm.elements.project_name.value.trim() || currentProject.name;
-    editTitle.textContent = `Редагування — ${name}`;
+    editTitle.textContent = `Редагування проєкту — ${name}`;
 });
 editForm.addEventListener("submit", saveProjectAndTasks);
 

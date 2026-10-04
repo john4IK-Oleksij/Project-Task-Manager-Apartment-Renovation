@@ -13,6 +13,7 @@ const PRIORITIES = [
     ["medium", "Середній"],
     ["high", "Високий"],
 ];
+const PRIORITY_LABELS = Object.fromEntries(PRIORITIES);
 
 function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -22,7 +23,7 @@ function el(tag, className, text) {
 }
 
 async function responseError(response, fallback) {
-    if (response.status === 404) return "Project не знайдено. Оновіть сторінку та спробуйте ще раз.";
+    if (response.status === 404) return "Проєкт не знайдено. Оновіть сторінку та спробуйте ще раз.";
     try {
         const body = await response.json();
         if (typeof body.detail === "string") return body.detail;
@@ -40,7 +41,8 @@ function renderTask(task, index) {
     li.append(
         el("span", "task-number", `${index + 1}.`),
         el("span", "project-card__checkbox", task.is_done ? "✓" : "○"),
-        el("span", "", task.title)
+        el("span", "project-card__task-name", task.title),
+        el("span", `badge badge--${task.priority}`, PRIORITY_LABELS[task.priority])
     );
     return li;
 }
@@ -115,7 +117,7 @@ function renderProject(project) {
         "project-card__progress",
         `${done} / ${total} виконано · ${percent}%`
     );
-    const link = el("a", "project-card__link", "Відкрити Project →");
+    const link = el("a", "project-card__link", "Відкрити проєкт →");
     link.href = url;
     const footer = el("div", "project-card__footer");
     footer.append(progress, link);
@@ -127,8 +129,8 @@ function renderProject(project) {
 function openProjectForm() {
     projectForm.reset();
     projectFormError.hidden = true;
-    projectDialogTitle.textContent = "Новий Project";
-    saveProjectButton.textContent = "Створити Project";
+    projectDialogTitle.textContent = "Новий проєкт";
+    saveProjectButton.textContent = "Створити проєкт";
     updateTaskPriorityFields();
     projectDialog.showModal();
     projectForm.elements.name.focus();
@@ -147,12 +149,12 @@ async function deleteProject(project) {
     try {
         const response = await fetch(`/projects/${project.id}`, { method: "DELETE" });
         if (!response.ok) {
-            throw new Error(await responseError(response, "Не вдалося видалити Project."));
+            throw new Error(await responseError(response, "Не вдалося видалити проєкт."));
         }
         await loadProjects();
     } catch (error) {
         statusEl.hidden = false;
-        statusEl.textContent = error.message || "Не вдалося видалити Project. Перевірте з’єднання та спробуйте ще раз.";
+        statusEl.textContent = error.message || "Не вдалося видалити проєкт. Перевірте з’єднання та спробуйте ще раз.";
     }
 }
 
@@ -160,16 +162,16 @@ async function loadProjects() {
     try {
         const response = await fetch("/projects/?limit=100");
         if (!response.ok) {
-            throw new Error(await responseError(response, "Не вдалося завантажити Projects."));
+            throw new Error(await responseError(response, "Не вдалося завантажити проєкти."));
         }
         const projects = await response.json();
 
         grid.replaceChildren(...projects.map(renderProject));
         statusEl.hidden = projects.length > 0;
-        statusEl.textContent = "Поки немає жодного Project.";
+        statusEl.textContent = "Поки немає жодного проєкту.";
     } catch (error) {
         statusEl.hidden = false;
-        statusEl.textContent = error.message || "Не вдалося завантажити Projects. Спробуйте пізніше.";
+        statusEl.textContent = error.message || "Не вдалося завантажити проєкти. Спробуйте пізніше.";
     }
 }
 
@@ -187,9 +189,15 @@ projectForm.addEventListener("submit", async (event) => {
 
     const name = projectForm.elements.name.value.trim();
     if (!name) {
-        projectForm.elements.name.setCustomValidity("Введіть назву Project.");
+        projectForm.elements.name.setCustomValidity("Введіть назву проєкту.");
         projectForm.reportValidity();
         projectForm.elements.name.setCustomValidity("");
+        return;
+    }
+    if (/^\p{Decimal_Number}+$/u.test(name)) {
+        projectFormError.textContent = "Назва проєкту не може складатися лише з цифр.";
+        projectFormError.hidden = false;
+        projectForm.elements.name.focus();
         return;
     }
 
@@ -206,6 +214,12 @@ projectForm.addEventListener("submit", async (event) => {
             projectTaskTitles.focus();
             return;
         }
+        if (taskTitles.some((title) => /^\p{Decimal_Number}+$/u.test(title))) {
+            projectFormError.textContent = "Назва задачі не може складатися лише з цифр.";
+            projectFormError.hidden = false;
+            projectTaskTitles.focus();
+            return;
+        }
         const taskPriorities = [...projectTaskFields.querySelectorAll(".project-form__task-priority")];
         payload.tasks = taskTitles.map((title, index) => ({
             title,
@@ -218,12 +232,12 @@ projectForm.addEventListener("submit", async (event) => {
             body: JSON.stringify(payload),
         });
         if (!response.ok) {
-            throw new Error(await responseError(response, "Не вдалося створити Project."));
+            throw new Error(await responseError(response, "Не вдалося створити проєкт."));
         }
         projectDialog.close();
         location.reload();
     } catch (error) {
-        projectFormError.textContent = error.message || "Не вдалося створити Project. Спробуйте ще раз.";
+        projectFormError.textContent = error.message || "Не вдалося створити проєкт. Спробуйте ще раз.";
         projectFormError.hidden = false;
     } finally {
         saveProjectButton.disabled = false;

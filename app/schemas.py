@@ -11,17 +11,18 @@ class TaskBase(BaseModel):
     priority: Priority = Priority.medium
     due_date: date | None = None
 
+
+class TaskCreate(TaskBase):
     @field_validator("title")
     @classmethod
     def normalize_title(cls, value: str) -> str:
         title = value.strip()
         if not title:
             raise ValueError("Назва задачі не може бути порожньою.")
+        if title.isdecimal():
+            raise ValueError("Назва задачі не може складатися лише з цифр.")
         return title
 
-
-class TaskCreate(TaskBase):
-    pass
 
 class TaskUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=150)
@@ -38,6 +39,8 @@ class TaskUpdate(BaseModel):
         title = value.strip()
         if not title:
             raise ValueError("Назва задачі не може бути порожньою.")
+        if title.isdecimal():
+            raise ValueError("Назва задачі не може складатися лише з цифр.")
         return title
 
 
@@ -67,6 +70,13 @@ class ProjectBase(BaseModel):
 class ProjectCreate(ProjectBase):
     tasks: list[TaskCreate] = Field(default_factory=list)
 
+    @field_validator("name")
+    @classmethod
+    def validate_name_is_not_numeric(cls, value: str) -> str:
+        if value.isdecimal():
+            raise ValueError("Назва проєкту не може складатися лише з цифр.")
+        return value
+
 
 class ProjectUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=200)
@@ -80,6 +90,8 @@ class ProjectUpdate(BaseModel):
         name = value.strip()
         if not name:
             raise ValueError("Назва проєкту не може бути порожньою.")
+        if name.isdecimal():
+            raise ValueError("Назва проєкту не може складатися лише з цифр.")
         return name
 
 
