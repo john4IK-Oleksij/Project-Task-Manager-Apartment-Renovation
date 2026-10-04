@@ -829,6 +829,25 @@ body {
     font-weight: 600;
 }
 
+.success-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 14px 20px;
+    background-color: var(--primary);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.success-banner[hidden] {
+    display: none;
+}
+
 .badge {
     padding: 4px 10px;
     border-radius: 999px;

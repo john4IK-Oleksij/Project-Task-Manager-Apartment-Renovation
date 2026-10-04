@@ -48,7 +48,7 @@ wheels = [
 ]
 
 [[package]]
-name = "back-taks-manager"
+name = "backend-12"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

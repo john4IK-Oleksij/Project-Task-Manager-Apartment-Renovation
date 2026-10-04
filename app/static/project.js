@@ -1,3 +1,34 @@
+const BANNER_KEY = "pendingBanner";
+const BANNER_DURATION_MS = 4000;
+let bannerTimer = null;
+
+function showBanner(message) {
+    let banner = document.getElementById("success-banner");
+    if (!banner) {
+        banner = document.createElement("div");
+        banner.id = "success-banner";
+        banner.className = "success-banner";
+        banner.setAttribute("role", "status");
+        document.body.prepend(banner);
+    }
+    banner.textContent = message;
+    banner.hidden = false;
+    clearTimeout(bannerTimer);
+    bannerTimer = setTimeout(() => {
+        banner.hidden = true;
+    }, BANNER_DURATION_MS);
+}
+
+function showBannerAfterReload(message) {
+    sessionStorage.setItem(BANNER_KEY, message);
+}
+
+const pendingBanner = sessionStorage.getItem(BANNER_KEY);
+if (pendingBanner) {
+    sessionStorage.removeItem(BANNER_KEY);
+    showBanner(pendingBanner);
+}
+
 const statusEl = document.getElementById("project-status");
 const details = document.getElementById("project-details");
 const taskList = document.getElementById("task-list");
@@ -269,6 +300,7 @@ async function saveTaskCompletion(isDone) {
         }
         await loadProject();
         taskActionStatus.hidden = true;
+        showBanner("Статус задачі оновлено.");
     } catch (error) {
         showTaskActionError(error.message || "Не вдалося змінити статус задачі. Спробуйте ще раз.");
     }
@@ -369,6 +401,7 @@ async function saveProjectAndTasks(event) {
         }
 
         allowNavigation = true;
+        showBannerAfterReload("Зміни успішно збережено.");
         location.href = `/static/project.html?id=${projectId}`;
     } catch (error) {
         const message = error.message || "Не вдалося зберегти зміни.";

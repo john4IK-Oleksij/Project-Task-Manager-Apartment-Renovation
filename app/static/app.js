@@ -1,3 +1,34 @@
+const BANNER_KEY = "pendingBanner";
+const BANNER_DURATION_MS = 4000;
+let bannerTimer = null;
+
+function showBanner(message) {
+    let banner = document.getElementById("success-banner");
+    if (!banner) {
+        banner = document.createElement("div");
+        banner.id = "success-banner";
+        banner.className = "success-banner";
+        banner.setAttribute("role", "status");
+        document.body.prepend(banner);
+    }
+    banner.textContent = message;
+    banner.hidden = false;
+    clearTimeout(bannerTimer);
+    bannerTimer = setTimeout(() => {
+        banner.hidden = true;
+    }, BANNER_DURATION_MS);
+}
+
+function showBannerAfterReload(message) {
+    sessionStorage.setItem(BANNER_KEY, message);
+}
+
+const pendingBanner = sessionStorage.getItem(BANNER_KEY);
+if (pendingBanner) {
+    sessionStorage.removeItem(BANNER_KEY);
+    showBanner(pendingBanner);
+}
+
 const grid = document.getElementById("projects-grid");
 const statusEl = document.getElementById("projects-status");
 const addProjectButton = document.getElementById("add-project");
@@ -152,6 +183,7 @@ async function deleteProject(project) {
             throw new Error(await responseError(response, "Не вдалося видалити проєкт."));
         }
         await loadProjects();
+        showBanner("Проєкт успішно видалено.");
     } catch (error) {
         statusEl.hidden = false;
         statusEl.textContent = error.message || "Не вдалося видалити проєкт. Перевірте з’єднання та спробуйте ще раз.";
@@ -235,6 +267,7 @@ projectForm.addEventListener("submit", async (event) => {
             throw new Error(await responseError(response, "Не вдалося створити проєкт."));
         }
         projectDialog.close();
+        showBannerAfterReload("Проєкт успішно створено.");
         location.reload();
     } catch (error) {
         projectFormError.textContent = error.message || "Не вдалося створити проєкт. Спробуйте ще раз.";
