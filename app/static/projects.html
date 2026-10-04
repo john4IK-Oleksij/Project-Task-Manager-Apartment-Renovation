@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Ремонт квартири</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="/static/style.css?v=6">
+</head>
+
+<body>
+   <main class="projects-page">
+      <div class="projects-page__container">
+         <div class="projects-page__header">
+            <div>
+               <h1 class="projects-page__title">Ремонт квартири</h1>
+               <p class="projects-page__subtitle">
+                  Керуйте проєктами та задачами ремонту
+               </p>
+            </div>
+            <button class="projects-page__add" id="add-project" type="button">
+               + Додати Project
+            </button>
+         </div>
+         <p class="projects-page__status" id="projects-status">Завантаження…</p>
+         <div class="projects-grid" id="projects-grid"></div>
+         <dialog class="project-dialog" id="project-dialog" aria-labelledby="project-dialog-title">
+            <form class="project-form" id="project-form">
+               <h2 class="project-dialog__title" id="project-dialog-title">Новий Project</h2>
+               <label class="project-form__field">
+                  Назва
+                  <input name="name" type="text" maxlength="200" required>
+               </label>
+               <label class="project-form__field">
+                  Опис проєкту
+                  <textarea name="description" rows="4"></textarea>
+               </label>
+               <label class="project-form__field" id="project-tasks-field">
+                  Мета проєкту
+                  <textarea id="project-task-titles" rows="5"
+                     placeholder="Наприклад:&#10;Демонтувати стару підлогу&#10;Придбати матеріали"></textarea>
+               </label>
+               <fieldset class="project-form__tasks" id="project-priorities-field">
+                  <legend>Пріоритет кожної задачі</legend>
+                  <div class="project-form__task-list" id="project-task-fields">
+                     <p class="project-form__task-hint">Для відзнаки пріоритету додайте хоча б одне завдання</p>
+                  </div>
+               </fieldset>
+               <p class="project-form__error" id="project-form-error" role="alert" hidden></p>
+               <div class="project-form__actions">
+                  <button class="project-form__cancel" id="cancel-project" type="button">Скасувати</button>
+                  <button class="projects-page__add" id="save-project" type="submit">Створити Project</button>
+               </div>
+            </form>
+         </dialog>
+      </div>
+   </main>
+   <script src="/static/app.js?v=7"></script>
+</body>
+
+</html>

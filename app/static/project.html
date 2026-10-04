@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Project — Ремонт квартири</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="/static/style.css?v=10">
+</head>
+
+<body>
+   <main class="projects-page">
+      <div class="projects-page__container">
+         <a class="back-link" href="/">← До всіх Projects</a>
+         <p class="projects-page__status" id="project-status">Завантаження…</p>
+         <section class="project-details" id="project-details" hidden>
+            <h1 class="projects-page__title" id="project-title"></h1>
+            <p class="projects-page__subtitle" id="project-description"></p>
+            <div class="project-details__progress">
+               <div class="project-card__bar" id="project-bar" role="progressbar" aria-valuemin="0"
+                  aria-valuemax="100">
+                  <div class="project-card__bar-fill" id="project-bar-fill"></div>
+               </div>
+               <span class="project-card__progress" id="project-progress"></span>
+            </div>
+            <div class="project-details__task-header">
+               <h2 class="project-details__heading">Tasks</h2>
+               <button class="projects-page__add" id="edit-project" type="button">Редагувати Project і Tasks</button>
+            </div>
+            <p class="task-action-status" id="task-action-status" role="status" hidden></p>
+            <ul class="task-list" id="task-list"></ul>
+            <p class="projects-page__status" id="tasks-empty" hidden>У цьому Project ще немає Tasks.</p>
+         </section>
+         <section class="project-editor" id="project-edit-view" hidden>
+            <form class="project-form" id="project-edit-form">
+               <h1 class="project-dialog__title" id="project-edit-title"></h1>
+               <label class="project-form__field">
+                  Назва проєкту
+                  <input name="project_name" type="text" maxlength="200" required>
+               </label>
+               <label class="project-form__field">
+                  Опис проєкту
+                  <textarea name="project_description" rows="3"></textarea>
+               </label>
+               <div class="project-edit__tasks-header">
+                  <h3 class="project-edit__tasks-title">Задачі проєкту</h3>
+                  <button class="project-form__cancel" id="add-edit-task" type="button">+ Додати Task</button>
+               </div>
+               <p class="project-edit__empty" id="project-edit-empty" hidden>У проєкті ще немає задач.</p>
+               <div class="project-edit__task-list" id="project-edit-task-list"></div>
+               <p class="project-form__error" id="project-edit-error" role="alert" hidden></p>
+               <div class="project-form__actions">
+                  <a class="project-form__cancel" id="cancel-project-edit" href="/">Скасувати</a>
+                  <button class="projects-page__add" id="save-project-edit" type="submit">Зберегти зміни</button>
+               </div>
+            </form>
+         </section>
+         <dialog class="project-dialog task-completion-dialog" id="task-completion-dialog"
+            aria-labelledby="task-completion-title">
+            <div class="project-form">
+               <h2 class="project-dialog__title" id="task-completion-title">Статус Task</h2>
+               <p class="task-completion-dialog__question" id="task-completion-question"></p>
+               <div class="project-form__actions">
+                  <button class="project-form__cancel" id="cancel-task-completion" type="button">Скасувати</button>
+                  <button class="project-form__cancel" id="mark-task-not-done" type="button">Ні, не виконана</button>
+                  <button class="projects-page__add" id="mark-task-done" type="button">Так, виконана</button>
+               </div>
+            </div>
+         </dialog>
+      </div>
+   </main>
+   <script src="/static/project.js?v=10"></script>
+</body>
+
+</html>
