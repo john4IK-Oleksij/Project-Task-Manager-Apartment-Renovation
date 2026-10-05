@@ -1,4 +1,5 @@
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Priority, Task
@@ -23,12 +24,12 @@ def get_tasks(
     priority: Priority | None = None,
     is_done: bool | None = None,
 ) -> list[Task]:
-    query = session.query(Task).filter(Task.project_id == project_id)
+    stmt = select(Task).where(Task.project_id == project_id)
     if priority is not None:
-        query = query.filter(Task.priority == priority)
+        stmt = stmt.where(Task.priority == priority)
     if is_done is not None:
-        query = query.filter(Task.is_done == is_done)
-    return query.all()
+        stmt = stmt.where(Task.is_done == is_done)
+    return list(session.scalars(stmt).all())
 
 
 def update_task(session: Session, task: Task, payload: TaskUpdate) -> Task:

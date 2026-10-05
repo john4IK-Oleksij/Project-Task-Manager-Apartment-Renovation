@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models import Priority
 
@@ -35,13 +35,20 @@ class TaskUpdate(BaseModel):
     @classmethod
     def normalize_title(cls, value: str | None) -> str | None:
         if value is None:
-            raise ValueError("Назва задачі не може бути порожньою.")
+            return value
         title = value.strip()
         if not title:
             raise ValueError("Назва задачі не може бути порожньою.")
         if title.isdecimal():
             raise ValueError("Назва задачі не може складатися лише з цифр.")
         return title
+
+# Якщо title передано у PATCH, він не може бути null.
+    @model_validator(mode="after")
+    def forbid_null_title(self) -> "TaskUpdate":
+        if "title" in self.model_fields_set and self.title is None:
+            raise ValueError("Назва задачі не може бути null.")
+        return self
 
 
 class TaskResponse(TaskBase):
@@ -68,7 +75,7 @@ class ProjectBase(BaseModel):
 
 
 class ProjectCreate(ProjectBase):
-    tasks: list[TaskCreate] = Field(default_factory=list)
+    tasks: list[TaskCreate] = Field(default_factory=list[TaskCreate])
 
     @field_validator("name")
     @classmethod
@@ -86,13 +93,19 @@ class ProjectUpdate(BaseModel):
     @classmethod
     def normalize_name(cls, value: str | None) -> str | None:
         if value is None:
-            raise ValueError("Назва проєкту не може бути порожньою.")
+            return value
         name = value.strip()
         if not name:
             raise ValueError("Назва проєкту не може бути порожньою.")
         if name.isdecimal():
             raise ValueError("Назва проєкту не може складатися лише з цифр.")
         return name
+
+    @model_validator(mode="after")
+    def forbid_null_name(self) -> "ProjectUpdate":
+        if "name" in self.model_fields_set and self.name is None:
+            raise ValueError("Назва проєкту не може бути null.")
+        return self
 
 
 class ProjectResponse(ProjectBase):
